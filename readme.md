@@ -4,6 +4,24 @@ Refer to Xilinx official documentation: [Xiilnx Virtual Cable(XVC)](https://www.
 
 I'd like to make a similar one for [TUL pynq-z2 development board](https://www.tul.com.tw/ProductsPYNQ-Z2.html) with [non project TCL mode (page 22)](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2016_2/ug892-vivado-design-flows-overview.pdf).
 
+## 0. Others link
+
+### 0.1 petalinux-tool-v2020.2
+
+``` text
+wget https://xilinx-ax-dl.entitlenow.com/dl/ul/2020/11/20/R210411071/petalinux-v2020.2-final-installer.run/0b149a36a17c78210da6b0002a15805f/604653AE?akdm=0&filename=petalinux-v2020.2-final-installer.run
+```
+
+If you'd like to build *xvc-pynq-z2-petalinux-docker*,
+
+this is necessary tool for building petalinux-docker for xvc-pynq.
+
+### 0.2 (Official) Document is helpful
+
+``` bash
+git clone git@github.com:curly-wei/xvc-pynq-z2-rsc.git
+```
+
 ## 1 How to build hw
 
 ### 1.0 Before build
