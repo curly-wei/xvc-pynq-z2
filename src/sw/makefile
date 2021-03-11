@@ -3,13 +3,13 @@ kProjRootDir := $(realpath ../)
 kInstallPrefix := /usr
 
 kCSrcDir := ${kProjRootDir}/src/sw
+kIncludeDirs := ${kCSrcDir}
 kSystemdFileDir := ${kProjRootDir}/src/sw
 kBuildDir := ${kProjRootDir}/build/xvc_server_sw
 kOutDir := ${kBuildDir}/out
 
 kTarget := xvc_server
 
-kIncludeDirs := ${kCSrcDir}
 kCSrcFiless := ${kTarget}.c
 kSystemdFile := ${kTarget}d.service
 
@@ -20,7 +20,7 @@ objs := ${kBuildDir}/${kTarget}.o
 target := ${kOutDir}/${kTarget}
 systemd_out_path := ${kOutDir}/${kSystemdFile}
 bin_install_path := ${kInstallPrefix}/bin
-sd_install_path := ${kInstallPrefix}/lib/systemd/system/${kSystemdFile}
+sd_install_path := ${kInstallPrefix}/lib/systemd/system
 
 # Features of Compiler and linker
 CC := /usr/bin/arm-linux-gnueabihf-gcc
@@ -62,5 +62,5 @@ install: cp_sd, linking
 	cp -f ${systemd_out_path} ${sd_install_path} 
 
 uninstall:
-	rm -f ${target} ${bin_install_path}
-	rm -f ${systemd_out_path} ${sd_install_path} 
+	rm -f ${bin_install_path}/${kTarget}
+	rm -f ${sd_install_path}/${kSystemdFile}
