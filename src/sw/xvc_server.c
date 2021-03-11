@@ -94,7 +94,7 @@ static inline bool SteadmRead(
  * @return true Result is successed
  * @return false Any error in the result
  */
-static inline bool jtag_eth_bridge (fd_t eth, volatile jtag_t* jtag);
+static inline bool jtag_eth_bridge (fd_t eth, volatile jtag_t* jtag) {};
 
 int main() {
   // init fd to uio
@@ -196,7 +196,7 @@ int main() {
 
 
         } else {
-          handle_data(fd_iter, xvc_jtag_mem_loc);
+          jtag_eth_bridge(fd_iter, xvc_jtag_mem_loc);
         }
       // } else if () {
         

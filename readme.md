@@ -16,7 +16,7 @@ If you'd like to build *xvc-pynq-z2-petalinux-docker*,
 
 this is necessary tool for building petalinux-docker for xvc-pynq.
 
-### 0.2 (Official) Document is helpful
+### 0.2 (Official) Documentations will help you
 
 ``` bash
 git clone git@github.com:curly-wei/xvc-pynq-z2-rsc.git
@@ -116,49 +116,14 @@ and recomplie also clean all of previous generated object,
 
 `write_checkpoint` maybe you don't need.
 
-## 2 How to build sw
+## 2. How to build xvc-pynq-z2-petalinux-docker
 
-### 2.1 Prepare Petalinux
+## 3. How to build sw
 
-#### 2.1.0 Petalinux-tools only can be run on the Linux platform
-
-#### 2.1.1. Download [Xilinx Petalinux tools](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-design-tools.html)
-
-#### 2.1.2 Before execute Petalinux-tools, please ensure that [Dependencies](https://wiki.archlinux.org/index.php/Xilinx_Vivado#Dependencies_for_petalinux-tools) has been installed
-
-#### 2.1.3 Please also ensure the version of petalinux-tools is same to vivado
-
-#### 2.1.4 Go to directory of downloaded petalinux-tools, install with **user** in yout terminal
+### 3.0 Necessary packages
 
 ``` bash
-$ chmod +x ./petalinux-v<petalinux-version>-final-installer.run
-$ ./petalinux-v<petalinux-version>-final-installer.run --dir <INSTALL_DIR>
-#(I recommend settting <INSTALL_DIR> to `/home/<user>`)
-```
-
-#### 2.1.5 Append following **env.var** to *.bashrc*
-
-``` bash
-source /<dir-to-step5-installed>/settings.sh
-export PATH=$PATH:/tools/Xilinx/Vivado/2019.2/bin
-export PATH=$PATH:/tools/Xilinx/Vitis/2020.2/bin
-```
-
-#### 2.1.6 Build header of Vitis-gcc
-
-``` bash
-sudo /tools/Xilinx/Vivado/2020.2/lnx64/tools/gcc/libexec/gcc/x86_64-unknown-linux-gnu/4.6.3/install-tools/mkheaders /tools/Xilinx/Vivado/2020.2/lnx64/tools/gcc 
-```
-
-### 2.2 Build with build script
-
-0. Please **build hw** first
-1. After **build hw**, you should get a file `./build/<outdir>/*.hdf`
-2. Switch to bash, petalinux-tools **only support bash**, therefore do `$ bash`
-3. Start to build sw
-
-``` bash
-source ../src/sw/script/top.sh xvc_linux ./out/xvc_system_top.xsa
+yay -S linux-api-headers pacutils arm-linux-gnueabihf-gcc-linaro-bin
 ```
 
 ## FAQ
