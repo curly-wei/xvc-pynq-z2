@@ -58,8 +58,10 @@ clean:
 	rm -rf ${kBuildDir}/*
 
 install: cp_sd, linking
-	cp -f ${target} ${bin_install_dir}
-	cp -f ${systemd_out_path} ${sd_install_dir} 
+	install -d ${bin_install_dir}
+	install -m 744 ${target} ${bin_install_dir}
+	install -d ${sd_install_dir}
+	install -m 744 ${systemd_out_path} ${sd_install_dir}
 
 uninstall:
 	rm -f ${bin_install_dir}/${kTarget}
