@@ -19,8 +19,8 @@ systemd_src_file := ${kSystemdFileDir}/${kSystemdFile}
 objs := ${kBuildDir}/${kTarget}.o
 target := ${kOutDir}/${kTarget}
 systemd_out_path := ${kOutDir}/${kSystemdFile}
-bin_install_path := ${kInstallPrefix}/bin
-sd_install_path := ${kInstallPrefix}/lib/systemd/system
+bin_install_dir := ${kInstallPrefix}/bin
+sd_install_dir := ${kInstallPrefix}/lib/systemd/system
 
 # Features of Compiler and linker
 CC := /usr/bin/arm-linux-gnueabihf-gcc
@@ -58,9 +58,9 @@ clean:
 	rm -rf ${kBuildDir}/*
 
 install: cp_sd, linking
-	cp -f ${target} ${bin_install_path}
-	cp -f ${systemd_out_path} ${sd_install_path} 
+	cp -f ${target} ${bin_install_dir}
+	cp -f ${systemd_out_path} ${sd_install_dir} 
 
 uninstall:
-	rm -f ${bin_install_path}/${kTarget}
-	rm -f ${sd_install_path}/${kSystemdFile}
+	rm -f ${bin_install_dir}/${kTarget}
+	rm -f ${sd_install_dir}/${kSystemdFile}
