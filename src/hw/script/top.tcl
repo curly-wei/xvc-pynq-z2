@@ -9,7 +9,7 @@
 #
 
 #Define output directory area
-set kOutputDir "out" 
+set kOutputDir "xvc_server_hw" 
 
 #clean previois buildedcd folder and design
 set kVivadoDefaultGenOutFolders { ".srcs" ".gen" ".Xil" "NA" }

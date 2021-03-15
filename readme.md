@@ -122,9 +122,24 @@ and recomplie also clean all of previous generated object,
 
 ### 3.0 Necessary packages
 
+* linux-api-headers
+* pacutils
+* arm-linux-gnueabihf-gcc-linaro-bin
+[Linaro GCC Compiler version 7.1, arm-linux-gnueabihf](https://www.linaro.org/downloads/), for Archlinux, installer in the `./src/sw/archlinux-linaro-gcc-7.3`, just run `makepkg -si` in there
+
+### 3.1 Build
+
+`cd` to build folder, see [#1.1](###1.1-Using-*vivado-tcl-cli-mode*)
+
 ``` bash
-yay -S linux-api-headers pacutils arm-linux-gnueabihf-gcc-linaro-bin
-```
+# Using bash in the root directory of this project
+$ cd build
+$ make -f ../src/sw/makefile release # release mode
+$ make -f ../src/sw/makefile # debug mode
+``` 
+
+Output files (bin, systemd-service, obj-temporary) located at `build/xvc_server_sw/`
+
 
 ## FAQ
 

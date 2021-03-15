@@ -6,7 +6,6 @@ kCSrcDir := ${kProjRootDir}/src/sw
 kIncludeDirs := ${kCSrcDir}
 kSystemdFileDir := ${kProjRootDir}/src/sw
 kBuildDir := ${kProjRootDir}/build/xvc_server_sw
-kOutDir := ${kBuildDir}/out
 
 kTarget := xvc_server
 
@@ -17,8 +16,8 @@ kSystemdFile := ${kTarget}d.service
 c_srcs := $(foreach csrcs, ${kCSrcFiless}, $(addprefix ${kCSrcDir}/, ${csrcs}) )
 systemd_src_file := ${kSystemdFileDir}/${kSystemdFile}
 objs := ${kBuildDir}/${kTarget}.o
-target := ${kOutDir}/${kTarget}
-systemd_out_path := ${kOutDir}/${kSystemdFile}
+target := ${kBuildDir}/${kTarget}
+systemd_out_path := ${kBuildDir}/${kSystemdFile}
 bin_install_dir := ${kInstallPrefix}/bin
 sd_install_dir := ${kInstallPrefix}/lib/systemd/system
 
@@ -40,7 +39,7 @@ debug: create_odir debug_compile linking cp_sd
 release: create_odir release_compile linking cp_sd
 
 create_odir:
-	mkdir -p ${kBuildDir} ${kOutDir}
+	mkdir -p ${kBuildDir} ${kBuildDir}
 
 linking: ${objs}
 	${CC} ${LDFLGAS} ${objs} -o ${target}
@@ -55,7 +54,7 @@ cp_sd:
 	cp -f ${systemd_src_file} ${systemd_out_path}
 
 clean:
-	rm -rf ${kBuildDir}/*
+	rm -rf ${kBuildDir}
 
 install: cp_sd, linking
 	install -d ${bin_install_dir}
