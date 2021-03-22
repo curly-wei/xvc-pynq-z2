@@ -6,7 +6,7 @@
  * @version 0.0.1
 */
 
-#include "xcv_server_param.h"
+#include "xvc_server_param.h"
 #include "xvc_server.h"
 
 #include <stdio.h>       
@@ -43,8 +43,10 @@
   #include <string.h> //print strings for error.h
   extern int errno ;
   #define XVC_ERROR_MSG(msg_str) XVC_ERROR_MSG_DETAIL(msg_str)
+  #define DEBUG_MSG(msg_str) printf("%s\n",msg_str)
 #else
   #define XVC_ERROR_MSG(msg_str) XVC_ERROR_MSG_SIMPLE(msg_str)
+  #define DEBUG_MSG(msg_str)
 #endif 
 
 /**
@@ -97,80 +99,100 @@ static inline bool SteadmRead(
 static inline bool jtag_eth_bridge (fd_t eth, volatile jtag_t* jtag) {};
 
 int main() {
-  // init fd to uio
+  DEBUG_MSG("Starting XVC Server");
+  
+  /* init fd to uio */
   fd_t xvc_fd_uio = open(kUIOPath, O_RDWR);
   if (xvc_fd_uio == kUnixFailed) {
     XVC_ERROR_MSG("Failed to Open UIO Device");
     exit(EXIT_FAILURE);
-  } 
+  } else {
+    /* Don't delete here or others DEBUG_MSG() 
+     * Because here can be optimize by gcc
+     * when you compile with release mode 
+     * see https://godbolt.org/z/f6jPPG
+     */
+    DEBUG_MSG("UIO opened");
+  }
 
-  // Mapping jtag memory from somewhere of memory to uio_port
+  
+
+  /* Mapping jtag memory from somewhere of memory to uio_port */
   volatile jtag_t* xvc_jtag_mem_loc = (volatile jtag_t*) mmap(
       NULL, kMapSize, PROT_READ | PROT_WRITE, 
       MAP_SHARED, xvc_fd_uio, 0);
   if (xvc_jtag_mem_loc == MAP_FAILED) {
     XVC_ERROR_MSG("Failed to Mapping from mem to Jtag port ");
     exit(EXIT_FAILURE);
+  } else {
+    DEBUG_MSG("mmap successed");
   }
 
-  // init fd to socket, use TCP mode
-  fd_t xvc_fd_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //fd to socket
+  /* init fd to socket, use TCP mode */
+  fd_t xvc_fd_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); 
   if (xvc_fd_socket == kUnixFailed) {
     XVC_ERROR_MSG("Failed to Open Socket");
     exit(EXIT_FAILURE);
+  } else {
+    DEBUG_MSG("Socket opened");
   }
 
-  // Conf opts of socket
+  /* Conf opts of socket */
   const int kReUseAddrIsTrue = 1 ;
   if (setsockopt(xvc_fd_socket, SOL_SOCKET, SO_REUSEADDR, 
           &kReUseAddrIsTrue, sizeof(kReUseAddrIsTrue) ) == 
       kUnixFailed ) {
     XVC_ERROR_MSG("Failed to setsockopt");
     exit(EXIT_FAILURE);
+  } else {
+    DEBUG_MSG("setsockopt successed");
   }
 
-  // Set port for xvc-server
+  /* Set port for xvc-server */
   struct sockaddr_in socket_addr = {
     .sin_addr.s_addr = INADDR_ANY,
     .sin_family = AF_INET,
     .sin_port = htons(kPort)
   };
   
-  // Bind address and port to Socket 
+  /* Bind address and port to Socket */
   socklen_t size_sock_addr = sizeof(socket_addr);
   if (bind(xvc_fd_socket, (struct sockaddr*) &socket_addr, 
             size_sock_addr) == 
       kUnixFailed) {
     XVC_ERROR_MSG("Failed to bind");
     exit(EXIT_FAILURE);
+  } else {
+    DEBUG_MSG("bind successed");
   }
   
-  // Listen
+  /* Listen */
   if (listen(xvc_fd_socket, kLenBacklog) == kUnixFailed) {
     XVC_ERROR_MSG("Failed to listen");
     exit(EXIT_FAILURE);
+  } else {
+    DEBUG_MSG("listen successed");
   }
 
-  // Only 1 eth-fd need to wait
+  /* Only 1 eth-fd need to wait */
   fd_t xvc_max_fd = xvc_fd_socket +1; 
   
-  // A connection (to prot-2542 of socket) in a set of fd
+  /* A connection (to prot-2542 of socket) in a set of fd */
   fd_set xvc_conn; 
 
-  // Countdown blocking mode
+  /* Countdown blocking mode */
   struct timeval tv_block_cd = { 
     .tv_sec = EthConnTimeOutSec,
     .tv_usec = 0
   }; 
-
   while (true) {
     FD_ZERO(&xvc_conn);
     FD_SET(xvc_fd_socket, &xvc_conn);
     fd_set rd = xvc_conn, wr = xvc_conn, except = xvc_conn;
 
-    // Wait event rd/wr/except from xvc_max_fd
+    /* Wait event rd/wr/except from xvc_max_fd */
     fd_t result_sel = select(xvc_max_fd, &rd, &wr, &except, &tv_block_cd);
-    //Check Result of select
+    /* Check Result of select */
     if (result_sel == kSelectFailed) {
       XVC_ERROR_MSG("Failed to Select");
       exit(EXIT_FAILURE);
@@ -179,18 +201,32 @@ int main() {
       exit(EXIT_FAILURE);
     } 
     
-    // Scan all fd after select() returned
+    /* Scan all fd after select() returned */
     for (size_t fd_iter = 0; fd_iter <= xvc_max_fd; fd_iter++) { 
-      // if find a socket which is we cared
+      /* if find the socket which is we care */
       if (FD_ISSET(fd_iter, &rd) ) {
         if (fd_iter == xvc_fd_socket) {
           fd_t newfd = accept(xvc_fd_socket, 
                               (struct sockaddr*) &socket_addr, 
-                              & size_sock_addr);
+                              &size_sock_addr);
           if (newfd == kUnixFailed) {
             XVC_ERROR_MSG("Failed to Accept New FD For Socket");
             exit(EXIT_FAILURE);
-          } 
+          } else {
+            DEBUG_MSG("Accept");  
+            const int kReUseAddrIsTrue = 1 ;
+            if (setsockopt(xvc_fd_socket, SOL_SOCKET, SO_REUSEADDR, 
+                    &kReUseAddrIsTrue, sizeof(kReUseAddrIsTrue) ) == 
+                kUnixFailed ) {
+              XVC_ERROR_MSG("setsockopt error for new socket");
+              exit(EXIT_FAILURE);
+            } else {
+              DEBUG_MSG("setsockopt successed for new socket");
+            }
+            
+          
+          
+          }
           
 
 

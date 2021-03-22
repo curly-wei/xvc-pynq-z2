@@ -116,16 +116,22 @@ and recomplie also clean all of previous generated object,
 
 `write_checkpoint` maybe you don't need.
 
-## 2. How to build xvc-pynq-z2-petalinux-docker
+## 2. How to configure os (binding device-tree, boot-loader, bit-stream-from-FPGA)
+
+* Vitis 2020.2, which `bin-path` contented in your `$PATH` env.var
+* uboot-tools
+* device-tree-compiler (dtc)
+
+### 2.0 Necessary packages for build os
 
 ## 3. How to build sw
 
-### 3.0 Necessary packages
+### 3.0 Necessary packages for build sw
 
 * linux-api-headers
 * pacutils
 * arm-linux-gnueabihf-gcc-linaro-bin
-[Linaro GCC Compiler version 7.1, arm-linux-gnueabihf](https://www.linaro.org/downloads/), for Archlinux, installer in the `./src/sw/archlinux-linaro-gcc-7.3`, just run `makepkg -si` in there
+[Linaro GCC Compiler version 7.5, arm-linux-gnueabihf](https://www.linaro.org/downloads/), for Archlinux, installer in the `./src/sw/archlinux-linaro-gcc-7.5`, just run `makepkg -si` in there
 
 ### 3.1 Build
 
