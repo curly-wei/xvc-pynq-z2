@@ -6,17 +6,7 @@ I'd like to make a similar one for [TUL pynq-z2 development board](https://www.t
 
 ## 0. Others link
 
-### 0.1 petalinux-tool-v2020.2
-
-``` text
-wget https://xilinx-ax-dl.entitlenow.com/dl/ul/2020/11/20/R210411071/petalinux-v2020.2-final-installer.run/0b149a36a17c78210da6b0002a15805f/604653AE?akdm=0&filename=petalinux-v2020.2-final-installer.run
-```
-
-If you'd like to build *xvc-pynq-z2-petalinux-docker*,
-
-this is necessary tool for building petalinux-docker for xvc-pynq.
-
-### 0.2 (Official) Documentations will help you
+### 0.1 (Official) Documentations will help you
 
 ``` bash
 git clone git@github.com:curly-wei/xvc-pynq-z2-rsc.git
@@ -142,10 +132,9 @@ and recomplie also clean all of previous generated object,
 $ cd build
 $ make -f ../src/sw/makefile release # release mode
 $ make -f ../src/sw/makefile # debug mode
-``` 
+```
 
 Output files (bin, systemd-service, obj-temporary) located at `build/xvc_server_sw/`
-
 
 ## FAQ
 

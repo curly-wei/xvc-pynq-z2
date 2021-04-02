@@ -215,7 +215,7 @@ int main() {
           } else {
             DEBUG_MSG("Accept");  
             const int kReUseAddrIsTrue = 1 ;
-            if (setsockopt(xvc_fd_socket, SOL_SOCKET, SO_REUSEADDR, 
+            if (setsockopt(xvc_fd_socket, IPPROTO_TCP, TCP_NODELAY, 
                     &kReUseAddrIsTrue, sizeof(kReUseAddrIsTrue) ) == 
                 kUnixFailed ) {
               XVC_ERROR_MSG("setsockopt error for new socket");
