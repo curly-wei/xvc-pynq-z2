@@ -283,15 +283,15 @@ int main(int argc, char **argv) {
                if (newfd < 0) {
                   perror("accept");
                } else {
-            	   printf("setting TCP_NODELAY to 1\n");
-            	  int flag = 1;
-            	  int optResult = setsockopt(newfd,
+            	    printf("setting TCP_NODELAY to 1\n");
+            	  	int flag = 1;
+            	  	int optResult = setsockopt(newfd,
             			  	  	  	  	  	 IPPROTO_TCP,
             			  	  	  	  	  	 TCP_NODELAY,
             			  	  	  	  	  	 (char *)&flag,
             			  	  	  	  	  	 sizeof(int));
-            	  if (optResult < 0)
-            		  perror("TCP_NODELAY error");
+            	  	if (optResult < 0)
+            		  	perror("TCP_NODELAY error");
                   if (newfd > maxfd) {
                      maxfd = newfd;
                   }

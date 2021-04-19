@@ -19,7 +19,7 @@
 /**
  * @brief Type of file descriptor(fd) that POSIX defaults as int
  */
-typedef const int fd_t;
+typedef int fd_t;
 
 /**
  * @brief Type of buffer, recommend using char or unsigned char

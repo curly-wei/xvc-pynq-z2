@@ -38,6 +38,11 @@ static const int kLenBacklog = 128;
 /**
  * @brief Timeout value (sec) of connection to pending I/O from ethernet
  */
-static const int EthConnTimeOutSec = 30;
+static const size_t kEthConnTimeOutSec = 30;
+
+/**
+ * @brief Size of r/w buffer
+ */
+static const size_t kBufferSize = 256;
 
 #endif

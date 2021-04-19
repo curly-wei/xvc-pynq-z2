@@ -14,6 +14,7 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/mman.h>
 #include <sys/select.h>
 
@@ -75,7 +76,7 @@ enum SelectResult {
  * @return false Any error in the result
  */
 static inline bool SteadmRead(
-  	fd_t fd, 
+  	const fd_t fd, 
 		buffer_t* target, 
 		size_t len_to_read) {
   buffer_t* indirect = target;
@@ -96,13 +97,15 @@ static inline bool SteadmRead(
  * @return true Result is successed
  * @return false Any error in the result
  */
-static inline bool jtag_eth_bridge (fd_t eth, volatile jtag_t* jtag) {};
+static inline bool jtag_eth_bridge (const fd_t eth, volatile jtag_t* jtag) {
+  
+};
 
 int main() {
   DEBUG_MSG("Starting XVC Server");
   
   /* init fd to uio */
-  fd_t xvc_fd_uio = open(kUIOPath, O_RDWR);
+  const fd_t xvc_fd_uio = open(kUIOPath, O_RDWR);
   if (xvc_fd_uio == kUnixFailed) {
     XVC_ERROR_MSG("Failed to Open UIO Device");
     exit(EXIT_FAILURE);
@@ -114,8 +117,6 @@ int main() {
      */
     DEBUG_MSG("UIO opened");
   }
-
-  
 
   /* Mapping jtag memory from somewhere of memory to uio_port */
   volatile jtag_t* xvc_jtag_mem_loc = (volatile jtag_t*) mmap(
@@ -129,7 +130,7 @@ int main() {
   }
 
   /* init fd to socket, use TCP mode */
-  fd_t xvc_fd_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); 
+  const fd_t xvc_fd_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); 
   if (xvc_fd_socket == kUnixFailed) {
     XVC_ERROR_MSG("Failed to Open Socket");
     exit(EXIT_FAILURE);
@@ -178,20 +179,20 @@ int main() {
   fd_t xvc_max_fd = xvc_fd_socket +1; 
   
   /* A connection (to prot-2542 of socket) in a set of fd */
-  fd_set xvc_conn; 
+  fd_set xvc_conn_set; 
 
   /* Countdown blocking mode */
   struct timeval tv_block_cd = { 
-    .tv_sec = EthConnTimeOutSec,
+    .tv_sec = kEthConnTimeOutSec,
     .tv_usec = 0
   }; 
   while (true) {
-    FD_ZERO(&xvc_conn);
-    FD_SET(xvc_fd_socket, &xvc_conn);
-    fd_set rd = xvc_conn, wr = xvc_conn, except = xvc_conn;
+    FD_ZERO(&xvc_conn_set);
+    FD_SET(xvc_fd_socket, &xvc_conn_set);
+    fd_set rd = xvc_conn_set, wr = xvc_conn_set, except = xvc_conn_set;
 
     /* Wait event rd/wr/except from xvc_max_fd */
-    fd_t result_sel = select(xvc_max_fd, &rd, &wr, &except, &tv_block_cd);
+    const fd_t result_sel = select(xvc_max_fd, &rd, &wr, &except, &tv_block_cd);
     /* Check Result of select */
     if (result_sel == kSelectFailed) {
       XVC_ERROR_MSG("Failed to Select");
@@ -202,11 +203,11 @@ int main() {
     } 
     
     /* Scan all fd after select() returned */
-    for (size_t fd_iter = 0; fd_iter <= xvc_max_fd; fd_iter++) { 
+    for (fd_t fd_iter = 0; fd_iter <= xvc_max_fd; fd_iter++) { 
       /* if find the socket which is we care */
       if (FD_ISSET(fd_iter, &rd) ) {
         if (fd_iter == xvc_fd_socket) {
-          fd_t newfd = accept(xvc_fd_socket, 
+          const fd_t newfd = accept(xvc_fd_socket, 
                               (struct sockaddr*) &socket_addr, 
                               &size_sock_addr);
           if (newfd == kUnixFailed) {
@@ -214,32 +215,32 @@ int main() {
             exit(EXIT_FAILURE);
           } else {
             DEBUG_MSG("Accept");  
-            const int kReUseAddrIsTrue = 1 ;
-            if (setsockopt(xvc_fd_socket, IPPROTO_TCP, TCP_NODELAY, 
-                    &kReUseAddrIsTrue, sizeof(kReUseAddrIsTrue) ) == 
+            const char kTcpNoDelayIsTrue = 1;
+            /* Disable Nagle Algorithm */
+            if (setsockopt(newfd, IPPROTO_TCP, TCP_NODELAY, 
+                    &kTcpNoDelayIsTrue, sizeof(kTcpNoDelayIsTrue) ) == 
                 kUnixFailed ) {
-              XVC_ERROR_MSG("setsockopt error for new socket");
+              XVC_ERROR_MSG("setsockopt error for TCP_NODELAY");
               exit(EXIT_FAILURE);
             } else {
-              DEBUG_MSG("setsockopt successed for new socket");
-            }
-            
-          
-          
+              DEBUG_MSG("setsockopt successed for TCP_NODELAY");
+              /* Replace old fd (without set to TCP_NODELAY) 
+               * with new fd which can bobble up to top of fd_iter
+               */
+              if (newfd > xvc_max_fd)
+                xvc_max_fd = newfd;
+              FD_SET(newfd, &xvc_conn_set);
+            } 
           }
-          
-
-
-
+        } else if (FD_ISSET(fd_iter, &except) ) {
+          /* except */
+          XVC_ERROR_MSG("connection is except");
+          exit(EXIT_FAILURE);
         } else {
           jtag_eth_bridge(fd_iter, xvc_jtag_mem_loc);
         }
-      // } else if () {
-        
       }
     }
-
   }
-    
-
 }
+
