@@ -75,10 +75,11 @@ enum SelectResult {
  * @return true Result is successed
  * @return false Any error in the result
  */
-static inline bool SteadmRead(
+static inline bool StreamRead(
   	const fd_t fd, 
 		buffer_t* target, 
-		size_t len_to_read) {
+		size_t len_to_read
+) {
   buffer_t* indirect = target;
   while (len_to_read) {
 		ssize_t n_byte_read = read(fd, indirect, len_to_read); // ssize_t != int
@@ -97,8 +98,32 @@ static inline bool SteadmRead(
  * @return true Result is successed
  * @return false Any error in the result
  */
-static inline bool jtag_eth_bridge (const fd_t eth, volatile jtag_t* jtag) {
-  
+static inline bool jtag_eth_bridge(const fd_t eth, volatile jtag_t* jtag) {
+  while (true) {
+    buffer_t cmd[kCmdSize];
+    buffer_t buffer[kBufferSize], result[kBufferSize/2];
+    memset(cmd, 0, kCmdSize);
+
+    if (!StreamRead(eth, cmd, 2) )
+      return true;
+    
+    /* Read and judge command */
+    if (memcmp(cmd, "ge", 2) == (int) 0 ) {
+      if (!StreamRead(eth, cmd, 6) ) 
+        return true;
+      memcpy(result, kXVCInfo, strlen(kXVCInfo) );
+
+    } else if (memcmp(cmd, "se", 2) == (int) 0) {
+
+    } else if (memcmp(cmd, "sh", 2) == (int) 0) {
+      
+    } else {
+
+    }
+    
+
+  }
+
 };
 
 int main() {
@@ -142,7 +167,8 @@ int main() {
   const int kReUseAddrIsTrue = 1 ;
   if (setsockopt(xvc_fd_socket, SOL_SOCKET, SO_REUSEADDR, 
           &kReUseAddrIsTrue, sizeof(kReUseAddrIsTrue) ) == 
-      kUnixFailed ) {
+      kUnixFailed 
+  ) {
     XVC_ERROR_MSG("Failed to setsockopt");
     exit(EXIT_FAILURE);
   } else {
@@ -160,7 +186,8 @@ int main() {
   socklen_t size_sock_addr = sizeof(socket_addr);
   if (bind(xvc_fd_socket, (struct sockaddr*) &socket_addr, 
             size_sock_addr) == 
-      kUnixFailed) {
+      kUnixFailed
+  ) {
     XVC_ERROR_MSG("Failed to bind");
     exit(EXIT_FAILURE);
   } else {
@@ -233,7 +260,7 @@ int main() {
             } 
           }
         } else if (FD_ISSET(fd_iter, &except) ) {
-          /* except */
+          /* if except occured */
           XVC_ERROR_MSG("connection is except");
           exit(EXIT_FAILURE);
         } else {

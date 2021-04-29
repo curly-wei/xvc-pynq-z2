@@ -43,6 +43,13 @@ static const size_t kEthConnTimeOutSec = 30;
 /**
  * @brief Size of r/w buffer
  */
-static const size_t kBufferSize = 256;
+static const size_t kBufferSize = 2048;
+
+/**
+ * @brief Size of command
+ */
+static const size_t kCmdSize = 16;
+
+static const char kXVCInfo[] = "xvc_server_v1.0:2048\n";
 
 #endif
