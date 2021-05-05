@@ -1,12 +1,70 @@
-set kOutputDir "xvc_server_os" 
+set kAPPName "xvc_fsbl"
+set kPlatformName "${kAPPName}_pf"
+set kDomainName "${kAPPName}_dom"
+set kXSAFilePath "./xvc_server_hw/xvc_system_top.xsa"
+set kOutputDir "./xvc_server_os/fsbl" 
+
 setws ${kOutputDir}
 
-set kXSAFilePath "xvc_server_hw/xvc_system_top.xsa"
-createhw -name hw0 -hwspec ${kXSAFilePath}
+puts "=================================================================="
+puts "INFO: clear previous build objects"
+puts "=================================================================="
+file delete -force ${kOutputDir}
 
-createapp -name fsbl -app {Zynq FSBL} -proc ps7_cortexa9_0 \
-  -hwproject hw0 -os standalone
+puts "=================================================================="
+puts "INFO: check xsa file if exist"
+puts "=================================================================="
+if { [file exist ${kXSAFilePath}] == 1} {
+  puts "INFO: Found xsa file, located at:"
+  puts [file normalize ${kXSAFilePath}] 
+} else {
+  error "ERROR: xsa file does not exist"
+}
 
-project -build
+puts "=================================================================="
+puts "INFO: create pf"
+puts "=================================================================="
+platform create \
+  -name ${kPlatformName} \
+  -hw ${kXSAFilePath}
 
-exec bootgen -arch zynq -image output.bif -w -o BOOT.bin
+puts "=================================================================="
+puts "INFO: create domain"
+puts "=================================================================="
+domain create \
+  -name ${kDomainName} \
+  -os standalone \
+  -proc ps7_cortexa9_0
+
+puts "=================================================================="
+puts "INFO: set bsplib xilffs"
+puts "=================================================================="
+bsp setlib xilffs
+
+puts "=================================================================="
+puts "INFO: gen pf"
+puts "=================================================================="
+platform generate
+
+puts "=================================================================="
+puts "INFO: create app"
+puts "=================================================================="
+app create \
+  -name ${kAPPName} \
+  -platform ${kPlatformName} \
+  -domain ${kDomainName} \
+  -template {Zynq FSBL} 
+
+puts "=================================================================="
+puts "INFO: conf app"
+puts "=================================================================="
+app config \
+  -name ${kAPPName} \
+  define-compiler-symbols {FSBL_DEBUG_INFO}
+
+puts "=================================================================="
+puts "INFO: build app"
+puts "=================================================================="
+app build -name ${kAPPName} 
+
+#exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"

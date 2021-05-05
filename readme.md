@@ -108,11 +108,21 @@ and recomplie also clean all of previous generated object,
 
 ## 2. How to configure os (binding device-tree, boot-loader, bit-stream-from-FPGA)
 
+### 2.0 Necessary packages for build os
+
 * Vitis 2020.2, which `bin-path` contented in your `$PATH` env.var
 * uboot-tools
 * device-tree-compiler (dtc)
 
-### 2.0 Necessary packages for build os
+### 2.1 Build FSBL (First Stage Boot Loader)
+
+`cd` to build folder, see [#1.1](###1.1-Using-*vivado-tcl-cli-mode*)
+
+``` bash
+# Using bash in the root directory of this project
+$ cd build
+$ xsct -eval source ../src/os/gen_fsbl.tcl 
+```
 
 ## 3. How to build sw
 

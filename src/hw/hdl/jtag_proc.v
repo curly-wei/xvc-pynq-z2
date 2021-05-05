@@ -174,7 +174,7 @@ generate
 endgenerate
 
  //  assign TMS = tms_output[0] ? 1'bZ : 1'b0;
- assign TMS = tms_output[0];
+assign TMS = tms_output[0];
 //      OBUFT u0_OBUFT (
 //          .O (TMS) ,
 //          .I (1'b0) ,
@@ -196,7 +196,7 @@ assign TCK = tck_i;
 //           .I (1'b0) ,
 //           .T (~tck_i)
 //      );
-     assign TDO_VECTOR = tdo_capture2;
+assign TDO_VECTOR = tdo_capture2;
    
 
 endmodule
