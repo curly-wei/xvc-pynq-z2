@@ -121,7 +121,7 @@ and recomplie also clean all of previous generated object,
 ``` bash
 # Using bash in the root directory of this project
 $ cd build
-$ xsct -eval source ../src/os/gen_fsbl.tcl 
+$ xsct -eval source ../src/os/script/gen_fsbl.tcl 
 ```
 
 ## 3. How to build sw

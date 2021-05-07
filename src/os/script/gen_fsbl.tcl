@@ -1,8 +1,9 @@
 set kAPPName "xvc_fsbl"
 set kPlatformName "${kAPPName}_pf"
 set kDomainName "${kAPPName}_dom"
-set kXSAFilePath "./xvc_server_hw/xvc_system_top.xsa"
-set kOutputDir "./xvc_server_os/fsbl" 
+set kBuildDir "[pwd]"
+set kXSAFilePath "${kBuildDir}/xvc_server_hw/xvc_system_top.xsa"
+set kOutputDir "${kBuildDir}/xvc_server_os/fsbl" 
 
 setws ${kOutputDir}
 
@@ -67,4 +68,7 @@ puts "INFO: build app"
 puts "=================================================================="
 app build -name ${kAPPName} 
 
+puts "=================================================================="
+puts "INFO: Generate FSBL form app"
+puts "=================================================================="
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"

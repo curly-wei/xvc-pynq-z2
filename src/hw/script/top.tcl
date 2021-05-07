@@ -9,10 +9,21 @@
 #
 
 #Define output directory area
-set kOutputDir "./xvc_server_hw" 
+set kBuildDir "[pwd]"
+set kOutputDir "${kBuildDir}/xvc_server_hw" 
+puts ${kOutputDir}
 
 #clean previois buildedcd folder and design
-set kVivadoDefaultGenOutFolders { ".srcs" ".gen" ".Xil" "NA" }
+puts "=================================================================="
+puts "INFO: clear previous build objects"
+puts "=================================================================="
+set kVivadoDefaultGenOutFolders { 
+  "${kBuildDir}/.srcs" \ 
+  "${kBuildDir}/.gen" \
+  "${kBuildDir}/.Xil" \
+  "${kBuildDir}/NA"
+}
+puts "${kVivadoDefaultGenOutFolders}"
 set purged_dirs [ concat ${kVivadoDefaultGenOutFolders} ${kOutputDir} ]
 foreach dir ${purged_dirs} {
   file delete -force [ glob -nocomplain ${dir} ]
@@ -44,11 +55,13 @@ set_property DEFAULT_LIB work [current_project]
 # axi_jtage only can be compile with 'locked ip mode'
 set_property source_mgmt_mode All [current_project]
 
-#Define directory of source code and IP
-set kTopScriptDir "../src/hw/script/"
-set kVerilogSrcDirs { "../src/hw/hdl/" }
-set kXDCSrcDirs { "../src/hw/xdc/" }
-set kIPSrcDirs { "../src/hw/ip/" }
+#Define directory of source code and IP (dirs of srcs)
+set kTopSrcsDir [file normalize "${kBuildDir}/../src/hw"]
+set kTopScriptDir "${kTopSrcsDir}/script"
+set kVerilogSrcDirs { "${kTopSrcsDir}/hdl" }
+set kXDCSrcDirs { "${kTopSrcsDir}/xdc" }
+set kIPSrcDirs { "${kTopSrcsDir}/ip" }
+
 
 # Define preset file for ps
 set kPSPresetFile "${kTopScriptDir}/pynq-z2-ps-preset.tcl"
@@ -80,22 +93,24 @@ puts "=================================================================="
 #
 #Read-in verilog files from source folder
 foreach dirs ${kVerilogSrcDirs} {
-  set verilog_files [ glob -nocomplain "${dirs}/*.v" ]
+  puts ${kVerilogSrcDirs}
+  puts ${dirs}
+  set verilog_files [glob -nocomplain "${dirs}/*.v" ]
   if { ${verilog_files} != "" } {
     read_verilog ${verilog_files}
     puts "=================================================================="
-    puts "INFO: read-in verilog files: ${verilog_files}"
+    puts "INFO: read-in src-verilog files: \n${verilog_files}"
     puts "=================================================================="
   } 
 }
 
 # Read-in xdc files from source folder
 foreach dirs ${kXDCSrcDirs} {
-  set xdc_files [ glob -nocomplain "${dirs}/*.xdc" ]  
+  set xdc_files [glob -nocomplain "${dirs}/*.xdc" ]
   if { ${xdc_files} != "" } {
     read_xdc ${xdc_files}
     puts "=================================================================="
-    puts "INFO: read-in xdc files: ${xdc_files}"
+    puts "INFO: read-in xdc files: \n${xdc_files}"
     puts "=================================================================="
   }
 }
@@ -103,12 +118,12 @@ foreach dirs ${kXDCSrcDirs} {
 # Read-in ip files from source folders
 set has_ip_files 0
 foreach dirs ${kIPSrcDirs} {
-  set ip_files [ glob -nocomplain "${dirs}/*/*.xci" ]  
+  set ip_files [glob -nocomplain "${dirs}/*/*.xci" ]
   if { ${ip_files} != "" } {
     read_ip ${ip_files}
     set ${has_ip_files} 1
     puts "=================================================================="
-    puts "INFO: read-in ip files: ${ip_files}"
+    puts "INFO: read-in ip files: \n${ip_files}"
     puts "=================================================================="
   }
 }
@@ -124,7 +139,7 @@ if { ${has_ip_files} == 1 } {
 # Load ps preset
 if { [ file exists ${kPSPresetFile} ] == 1 } {
   puts "=================================================================="
-  puts "INFO: read-in files for ps preset: ${kPSPresetFile}"
+  puts "INFO: read-in files for ps preset: \n${kPSPresetFile}"
   puts "=================================================================="
   source ${kPSPresetFile}
 } else {
@@ -136,7 +151,7 @@ if { [ file exists ${kPSPresetFile} ] == 1 } {
 if { [ file exists ${kTopBDScriptFile} ] == 1 } {
   # read-in bd-created shell and execute it
   puts "=================================================================="
-  puts "INFO: read-in files for top bd: ${kTopBDScriptFile}"
+  puts "INFO: read-in files for top xvc-bd file: \n${kTopBDScriptFile}"
   puts "=================================================================="
   source ${kTopBDScriptFile}
   init_xcv_system_bd ${kBDName}
@@ -154,7 +169,10 @@ set_property synth_checkpoint_mode None [ get_files ${bd_file_and_path} ]
 generate_target all [ get_files ${bd_file_and_path} ]
 set top_bd_wrapper_name "${kBDName}_wrapper"
 set top_bd_wrapper_path \
-  ".gen/sources_1/bd/${kBDName}/hdl/${top_bd_wrapper_name}.v"
+  "${kBuildDir}/.gen/sources_1/bd/${kBDName}/hdl/${top_bd_wrapper_name}.v"
+puts "=================================================================="
+puts "INFO: read-in xvc-bd-wrapper-hdl file: \n${top_bd_wrapper_path}"
+puts "=================================================================="
 read_verilog ${top_bd_wrapper_path}
 
 # STEP#3: 
