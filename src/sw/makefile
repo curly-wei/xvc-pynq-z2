@@ -1,6 +1,6 @@
 # Project Resources
 kProjRootDir := $(realpath ../)
-kInstallPrefix := /usr
+kInstallPrefix ?= /usr
 
 kCSrcDir := ${kProjRootDir}/src/sw
 kIncludeDirs := ${kCSrcDir}
