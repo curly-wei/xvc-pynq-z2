@@ -1,3 +1,15 @@
+# Founction Redering string output
+proc RStr {strs} {
+  set kColorRBegin "\x1b\[1;31m"
+  set ColorEnd "\x1b\[0m"
+  return "${kColorRBegin}${strs}${ColorEnd}"
+}
+proc GStr {strs} {
+  set kColorGBegin "\x1b\[1;32m"
+  set ColorEnd "\x1b\[0m"
+  return "${kColorGBegin}${strs}${ColorEnd}"
+}
+
 set kAPPName "xvc_fsbl"
 set kPlatformName "${kAPPName}_pf"
 set kDomainName "${kAPPName}_dom"
@@ -7,34 +19,33 @@ set kOutputDir "${kBuildDir}/xvc_server_os/fsbl"
 
 setws ${kOutputDir}
 
-
-puts "UserINFO: clear previous build objects"
+puts [GStr "UserINFO: clear previous build objects"]
 file delete -force ${kOutputDir}
 
 
-puts "UserINFO: check xsa file if exist"
+puts [GStr "UserINFO: check xsa file if exist"]
 if { [file exist ${kXSAFilePath}] == 1} {
-  puts "UserINFO: Found xsa file, located at:"
-  puts [file normalize ${kXSAFilePath}] 
+  puts [GStr "UserINFO: Found xsa file, located at:"]
+  puts [GStr [file normalize ${kXSAFilePath}] ]
 } else {
-  error "ERROR: xsa file does not exist"
+  error [RStr "ERROR: xsa file does not exist"]
 }
 
 
-puts "UserINFO: create pf"
+puts [GStr "UserINFO: create pf"]
 platform create \
   -name ${kPlatformName} \
   -hw ${kXSAFilePath}
 
 
-puts "UserINFO: create domain"
+puts [GStr "UserINFO: create domain"]
 domain create \
   -name ${kDomainName} \
   -os standalone \
   -proc ps7_cortexa9_0
 
 
-puts "UserINFO: set bsplib xilffs"
+puts [GStr "UserINFO: set bsplib xilffs"]
 bsp setlib xilffs
 
 
