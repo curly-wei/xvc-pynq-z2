@@ -14,15 +14,15 @@ set kOutputDir "${kBuildDir}/xvc_server_hw"
 puts ${kOutputDir}
 
 #clean previois buildedcd folder and design
-puts "=================================================================="
-puts "INFO: clear previous build objects"
-puts "=================================================================="
-set kVivadoDefaultGenOutFolders { 
-  "${kBuildDir}/.srcs" \ 
+
+puts "UserINFO: clear previous build objects"
+set kVivadoDefaultGenOutFolders [ \
+  list \
+  "${kBuildDir}/.srcs" \
   "${kBuildDir}/.gen" \
   "${kBuildDir}/.Xil" \
-  "${kBuildDir}/NA"
-}
+  "${kBuildDir}/NA" \
+]
 puts "${kVivadoDefaultGenOutFolders}"
 set purged_dirs [ concat ${kVivadoDefaultGenOutFolders} ${kOutputDir} ]
 foreach dir ${purged_dirs} {
@@ -58,9 +58,9 @@ set_property source_mgmt_mode All [current_project]
 #Define directory of source code and IP (dirs of srcs)
 set kTopSrcsDir [file normalize "${kBuildDir}/../src/hw"]
 set kTopScriptDir "${kTopSrcsDir}/script"
-set kVerilogSrcDirs { "${kTopSrcsDir}/hdl" }
-set kXDCSrcDirs { "${kTopSrcsDir}/xdc" }
-set kIPSrcDirs { "${kTopSrcsDir}/ip" }
+set kVerilogSrcDirs [list "${kTopSrcsDir}/hdl" ]
+set kXDCSrcDirs [list "${kTopSrcsDir}/xdc" ]
+set kIPSrcDirs [list "${kTopSrcsDir}/ip" ]
 
 
 # Define preset file for ps
@@ -85,9 +85,8 @@ proc num_threads_run {} {
 }
 
 set_param general.maxThreads [num_threads_run]
-puts "=================================================================="
-puts "INFO: Max threads = [get_param general.maxThreads] "
-puts "=================================================================="
+puts "UserINFO: Max threads = [get_param general.maxThreads] "
+
 
 ## STEP#1: setup design sources and constraints
 #
@@ -98,9 +97,9 @@ foreach dirs ${kVerilogSrcDirs} {
   set verilog_files [glob -nocomplain "${dirs}/*.v" ]
   if { ${verilog_files} != "" } {
     read_verilog ${verilog_files}
-    puts "=================================================================="
-    puts "INFO: read-in src-verilog files: \n${verilog_files}"
-    puts "=================================================================="
+    
+    puts "UserINFO: read-in src-verilog files: \n${verilog_files}"
+    
   } 
 }
 
@@ -109,9 +108,9 @@ foreach dirs ${kXDCSrcDirs} {
   set xdc_files [glob -nocomplain "${dirs}/*.xdc" ]
   if { ${xdc_files} != "" } {
     read_xdc ${xdc_files}
-    puts "=================================================================="
-    puts "INFO: read-in xdc files: \n${xdc_files}"
-    puts "=================================================================="
+    
+    puts "UserINFO: read-in xdc files: \n${xdc_files}"
+    
   }
 }
 
@@ -122,9 +121,9 @@ foreach dirs ${kIPSrcDirs} {
   if { ${ip_files} != "" } {
     read_ip ${ip_files}
     set ${has_ip_files} 1
-    puts "=================================================================="
-    puts "INFO: read-in ip files: \n${ip_files}"
-    puts "=================================================================="
+    
+    puts "UserINFO: read-in ip files: \n${ip_files}"
+    
   }
 }
 
@@ -138,9 +137,9 @@ if { ${has_ip_files} == 1 } {
 #
 # Load ps preset
 if { [ file exists ${kPSPresetFile} ] == 1 } {
-  puts "=================================================================="
-  puts "INFO: read-in files for ps preset: \n${kPSPresetFile}"
-  puts "=================================================================="
+  
+  puts "UserINFO: read-in files for ps preset: \n${kPSPresetFile}"
+  
   source ${kPSPresetFile}
 } else {
   error "ERROR: read-in files for ps preset: < ${kPSPresetFile} > fail. \
@@ -150,9 +149,9 @@ if { [ file exists ${kPSPresetFile} ] == 1 } {
 # create the BD-Design
 if { [ file exists ${kTopBDScriptFile} ] == 1 } {
   # read-in bd-created shell and execute it
-  puts "=================================================================="
-  puts "INFO: read-in files for top xvc-bd file: \n${kTopBDScriptFile}"
-  puts "=================================================================="
+  
+  puts "UserINFO: read-in files for top xvc-bd file: \n${kTopBDScriptFile}"
+  
   source ${kTopBDScriptFile}
   init_xcv_system_bd ${kBDName}
   create_root_design ""
@@ -170,9 +169,8 @@ generate_target all [ get_files ${bd_file_and_path} ]
 set top_bd_wrapper_name "${kBDName}_wrapper"
 set top_bd_wrapper_path \
   "${kBuildDir}/.gen/sources_1/bd/${kBDName}/hdl/${top_bd_wrapper_name}.v"
-puts "=================================================================="
-puts "INFO: read-in xvc-bd-wrapper-hdl file: \n${top_bd_wrapper_path}"
-puts "=================================================================="
+
+puts "UserINFO: read-in xvc-bd-wrapper-hdl file: \n${top_bd_wrapper_path}"
 read_verilog ${top_bd_wrapper_path}
 
 # STEP#3: 
@@ -183,15 +181,13 @@ read_verilog ${top_bd_wrapper_path}
 # See
 # https://www.xilinx.com/support/answers/51688.html
 #
-puts "=================================================================="
-puts "INFO: Run Synthesis"
-puts "=================================================================="
+
+puts "UserINFO: Run Synthesis"
 reorder_files -auto
 synth_design -top ${top_bd_wrapper_name} -part ${kFPGAPart} -flatten rebuilt 
 
-puts "=================================================================="
-puts "INFO: Genetrate dcp/Report for Synthesis"
-puts "=================================================================="
+
+puts "UserINFO: Genetrate dcp/Report for Synthesis"
 write_checkpoint -force "${kOutputDir}/post_synth.dcp"
 report_timing_summary -file "${kOutputDir}/post_synth_timing_summary.rpt"
 report_power -file "${kOutputDir}/post_synth_power.rpt"
@@ -201,16 +197,14 @@ report_compile_order -file "${kOutputDir}/post_synth_compile_order.rpt"
 # run placement and logic optimzation, 
 # report utilization and timing estimates, write checkpoint design
 #
-puts "=================================================================="
-puts "INFO: Run Implementions"
-puts "=================================================================="
+
+puts "UserINFO: Run Implementions"
 opt_design
 place_design
 phys_opt_design
 
-puts "=================================================================="
-puts "INFO: Genetrate dcp/Report for Implementions"
-puts "=================================================================="
+
+puts "UserINFO: Genetrate dcp/Report for Implementions"
 #write_checkpoint -force "${kOutputDir}/post_place"
 report_timing_summary -file "${kOutputDir}/post_place_timing_summary.rpt"
 
@@ -218,15 +212,13 @@ report_timing_summary -file "${kOutputDir}/post_place_timing_summary.rpt"
 # run router, report actual utilization and timing, 
 # write checkpoint design, run drc, write verilog and xdc out
 #
-puts "=================================================================="
-puts "INFO: Run Route"
-puts "=================================================================="
+
+puts "UserINFO: Run Route"
 route_design
 write_checkpoint -force "${kOutputDir}/post_route"
 
-puts "=================================================================="
-puts "INFO: Genetrate dcp/Report for Route"
-puts "=================================================================="
+
+puts "UserINFO: Genetrate dcp/Report for Route"
 report_timing_summary -file "${kOutputDir}/post_route_timing_summary.rpt"
 report_timing -sort_by group -max_paths 100 -path_type summary -file \
   "${kOutputDir}/post_route_timing.rpt"
@@ -235,17 +227,15 @@ report_utilization -file "${kOutputDir}/post_route_util.rpt"
 report_power -file "${kOutputDir}/post_route_power.rpt"
 report_drc -file "${kOutputDir}/post_imp_drc.rpt"
 
-puts "=================================================================="
-puts "INFO: Genetrate Summrized xdc/hdl file"
-puts "=================================================================="
+
+puts "UserINFO: Genetrate Summrized xdc/hdl file"
 write_verilog -force "${kOutputDir}/${kBDName}_top_impl_netlist.v"
 write_xdc -no_fixed_only -force "${kOutputDir}/${kBDName}_top_impl.xdc"
 
 # STEP#6: generate a bitstream
 # 
-puts "=================================================================="
-puts "INFO: Genetrate Bitstream and debug info"
-puts "=================================================================="
+
+puts "UserINFO: Genetrate Bitstream and debug info"
 write_bitstream -force "${kOutputDir}/${kBDName}_top.bit"
 write_debug_probes -force "${kOutputDir}/${kBDName}_top.itx"
 
@@ -258,9 +248,8 @@ write_debug_probes -force "${kOutputDir}/${kBDName}_top.itx"
 # reason Refer to
 # https://www.xilinx.com/support/answers/60945.html
 #
-puts "=================================================================="
-puts "INFO: Genetrate xsa File"
-puts "=================================================================="
+
+puts "UserINFO: Genetrate xsa File"
 open_checkpoint "${kOutputDir}/post_route.dcp"
 set_property platform.design_intent.embedded true [current_project]
 set_property platform.design_intent.server_managed false [current_project]
