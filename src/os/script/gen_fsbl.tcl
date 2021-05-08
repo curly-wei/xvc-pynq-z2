@@ -28,7 +28,7 @@ if { [file exist ${kXSAFilePath}] == 1} {
   puts [GStr "UserINFO: Found xsa file, located at:"]
   puts [GStr [file normalize ${kXSAFilePath}] ]
 } else {
-  error [RStr "ERROR: xsa file does not exist"]
+  error [RStr "UserERROR: xsa file does not exist"]
 }
 
 
