@@ -15,13 +15,13 @@ set kOutputDir "${kBuildDir}/xvc_server_hw"
 # Founction Redering string output
 proc RStr {strs} {
   set kColorRBegin "\x1b\[1;31m"
-  set ColorEnd "\x1b\[0m"
-  return "${kColorRBegin}${strs}${ColorEnd}"
+  set kColorEnd "\x1b\[0m"
+  return "${kColorRBegin}${strs}${kColorEnd}"
 }
 proc GStr {strs} {
   set kColorGBegin "\x1b\[1;32m"
-  set ColorEnd "\x1b\[0m"
-  return "${kColorGBegin}${strs}${ColorEnd}"
+  set kColorEnd "\x1b\[0m"
+  return "${kColorGBegin}${strs}${kColorEnd}"
 }
 
 #clean previois buildedcd folder and design

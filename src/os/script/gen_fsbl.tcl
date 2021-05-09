@@ -1,13 +1,13 @@
 # Founction Redering string output
 proc RStr {strs} {
   set kColorRBegin "\x1b\[1;31m"
-  set ColorEnd "\x1b\[0m"
-  return "${kColorRBegin}${strs}${ColorEnd}"
+  set kColorEnd "\x1b\[0m"
+  return "${kColorRBegin}${strs}${kColorEnd}"
 }
 proc GStr {strs} {
   set kColorGBegin "\x1b\[1;32m"
-  set ColorEnd "\x1b\[0m"
-  return "${kColorGBegin}${strs}${ColorEnd}"
+  set kColorEnd "\x1b\[0m"
+  return "${kColorGBegin}${strs}${kColorEnd}"
 }
 
 set kAPPName "xvc_fsbl"
@@ -49,11 +49,11 @@ puts [GStr "UserINFO: set bsplib xilffs"]
 bsp setlib xilffs
 
 
-puts "UserINFO: gen pf"
+puts [GStr "UserINFO: gen pf"]
 platform generate
 
 
-puts "UserINFO: create app"
+puts [GStr "UserINFO: create app"]
 app create \
   -name ${kAPPName} \
   -platform ${kPlatformName} \
@@ -61,15 +61,15 @@ app create \
   -template {Zynq FSBL} 
 
 
-puts "UserINFO: conf app"
+puts [GStr "UserINFO: conf app"]
 app config \
   -name ${kAPPName} \
   define-compiler-symbols {FSBL_DEBUG_INFO}
 
 
-puts "UserINFO: build app"
+puts [GStr "UserINFO: build app"]
 app build -name ${kAPPName} 
 
 
-puts "UserINFO: Generate FSBL form app"
+puts [GStr "UserINFO: Generate FSBL form app"]
 #exec bootgen -arch zynq -image output.bif -w -o "${kOutputDir}/BOOT.BIN"
