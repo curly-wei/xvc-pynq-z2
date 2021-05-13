@@ -24,6 +24,10 @@ proc GStr {strs} {
   return "${kColorGBegin}${strs}${kColorEnd}"
 }
 
+puts [GStr "======================================"]
+puts [GStr "UserINFO: Start to build xvc_hw"]
+puts [GStr "======================================"]
+
 #clean previois buildedcd folder and design
 puts [GStr "UserINFO: clear previous build objects"]
 set kVivadoDefaultGenOutFolders [ \
@@ -249,5 +253,9 @@ set_property platform.default_output_type "sd_card" [current_project]
 write_hw_platform -fixed -include_bit -force -verbose \
   "${kOutputDir}/${kBDName}_top.xsa"
 validate_hw_platform -verbose "${kOutputDir}/${kBDName}_top.xsa"
+
+puts [GStr "======================================"]
+puts [GStr "UserINFO: Build xvc_hw completed"]
+puts [GStr "======================================"]
 
 #start_gui

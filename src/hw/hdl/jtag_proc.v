@@ -41,11 +41,11 @@ wire [31:0]  tdo_capture2;
 
 always @(posedge clk_i) begin: state_transfer
   if (reset_i == 1'b1) begin
-    state    <= Ideal_lk;
-    en_r <= 1'b0;
+    state <= Ideal_lk;
+    en_r  <= 1'b0;
   end else begin
-    state    <= next_state;
-    en_r <= en_i;
+    state <= next_state;
+    en_r  <= en_i;
   end
 end
 
