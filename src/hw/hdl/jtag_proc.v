@@ -17,8 +17,8 @@ module jtag_proc # (
   input  wire        tdo_i       
 );
 
-localparam Ideal_lk = 3'b001 ,
-localparam TCKL_lk  = 3'b010 ,
+localparam Ideal_lk = 3'b001 ;
+localparam TCKL_lk  = 3'b010 ;
 localparam TCKH_lk  = 3'b100 ;           
 
 reg [2:0]    state, next_state;
